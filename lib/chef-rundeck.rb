@@ -1,12 +1,12 @@
 #
 # Copyright 2010, Opscode, Inc.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,9 +70,9 @@ class ChefRundeck < Sinatra::Base
   private
   def node_xml(node)
     #--
-    # Newly created nodes and nodes reloaded with knife will not have these values set. 
+    # Newly created nodes and nodes reloaded with knife will not have these values set.
     # Loading them with 'unknown' and the node name as the FQDN gives us a chance at
-    # using rundeck with the machine until ohai gets a chance to populate these values.  
+    # using rundeck with the machine until ohai gets a chance to populate these values.
     #++
     if node[:kernel]
       #--
@@ -80,20 +80,20 @@ class ChefRundeck < Sinatra::Base
       #++
       os_family = node[:kernel][:os] =~ /windows/i ? 'windows' : 'unix'
       machine = node[:kernel][:machine]
-    else 
+    else
       os_family = 'unknown'
       machine = 'unknown'
     end
-    
-    platform = node[:platform] ? node[:platform] : platform = 'unknown'
-    platform_version = node[:platform_version] ? node[:platform_version] : 'unknown' 
 
-    if (! node[:cloud][:public_hostname].nil?) && ChefRundeck.cloud_hostname
+    platform = node[:platform] ? node[:platform] : platform = 'unknown'
+    platform_version = node[:platform_version] ? node[:platform_version] : 'unknown'
+
+    if !node[:cloud].nil? and !node[:cloud][:public_hostname].nil? and ChefRundeck.cloud_hostname
       fqdn = node[:cloud][:public_hostname]
     else
       fqdn = node[:fqdn] ? node[:fqdn] : node.name #Next best thing
     end
-    
+
     fqdn += ":#{ChefRundeck.ssh_port}" if ChefRundeck.ssh_port.to_i != 22
 
     # Allow overriding the username on a per-node basis.
@@ -101,10 +101,10 @@ class ChefRundeck < Sinatra::Base
     if node[:rundeck] && node[:rundeck].has_key?('username')
       username = node[:rundeck][:username]
     end
-    
+
     return <<-EOH
-<node name="#{xml_escape(node.name)}" 
-      type="Node" 
+<node name="#{xml_escape(node.name)}"
+      type="Node"
       description="#{xml_escape(node.name)}"
       osArch="#{xml_escape(machine)}"
       osFamily="#{xml_escape(os_family)}"
@@ -115,7 +115,7 @@ class ChefRundeck < Sinatra::Base
       hostname="#{xml_escape(fqdn)}"
       editUrl="#{xml_escape(ChefRundeck.web_ui_url)}/nodes/#{xml_escape(node.name)}/edit"/>
 EOH
-      
+
   end
 end
 

@@ -88,11 +88,7 @@ class ChefRundeck < Sinatra::Base
     platform = node[:platform] ? node[:platform] : platform = 'unknown'
     platform_version = node[:platform_version] ? node[:platform_version] : 'unknown'
 
-    if !node[:cloud].nil? and !node[:cloud][:public_hostname].nil? and ChefRundeck.cloud_hostname
-      fqdn = node[:cloud][:public_hostname]
-    else
-      fqdn = node[:fqdn] ? node[:fqdn] : node.name #Next best thing
-    end
+    fqdn = node[:ipaddress] ? node[:ipaddress] : node.name #Next best thing
 
     fqdn += ":#{ChefRundeck.ssh_port}" if ChefRundeck.ssh_port.to_i != 22
 
